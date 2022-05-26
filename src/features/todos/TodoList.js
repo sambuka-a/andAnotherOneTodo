@@ -1,6 +1,9 @@
 import styled, { keyframes } from 'styled-components'
 import { AiOutlineClose } from "react-icons/ai";
 import { Container } from "../../components/Container";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'
+
 import { Controls } from '../controls/Controls';
 
 import { useDispatch, useSelector } from "react-redux";
@@ -118,40 +121,47 @@ const TodoList = () => {
 
     useEffect(() => {
         dispatch(getTodos())
+          .unwrap()
+          .catch((err) => {
+            toast(err)
+          })
       }, [dispatch]);
 
 
   return (
-    <Container>
-      <List>
-      {error && <h2>Error</h2>}
-      {status === 'loading' && <h2>Loading</h2> }
-      {status === 'idle' && !error && todos.map((todo) => (
-        <Li key = {todo.id}>
-          <div>
-            <Label>
-              <Input
-                type='checkbox'
-                id = {todo.id}
-                checked = {todo.completed}
-                onChange={() => dispatch(toggleTodo(todo.id))}
-              />
-              <Indicator />
-            </Label>
-            {todo.title}
-          </div>
-          <AiOutlineClose onClick ={() => dispatch(removeTodo(todo.id))}/>
-        </Li>
-      ))}
-        <ControlsSection>
-          <small>
-          {allTodos.filter((item) => (item.completed === false)).length} items left
-          </small>
-          <Controls/>
-          <Button onClick={() => dispatch(clearCompleted())}>Clear Completed</Button>
-        </ControlsSection>
-      </List>
-    </Container>
+    <>
+      <ToastContainer/>
+      <Container>
+        <List>
+        {error && <h2>{error}</h2>}
+        {status === 'loading' && <h2>Loading</h2> }
+        {status === 'idle' && !error && todos.map((todo) => (
+          <Li key = {todo.id}>
+            <div>
+              <Label>
+                <Input
+                  type='checkbox'
+                  id = {todo.id}
+                  checked = {todo.completed}
+                  onChange={() => dispatch(toggleTodo(todo.id))}
+                />
+                <Indicator />
+              </Label>
+              {todo.title}
+            </div>
+            <AiOutlineClose onClick ={() => dispatch(removeTodo(todo.id))}/>
+          </Li>
+        ))}
+          <ControlsSection>
+            <small>
+            {allTodos.filter((item) => (item.completed === false)).length} items left
+            </small>
+            <Controls/>
+            <Button onClick={() => dispatch(clearCompleted())}>Clear Completed</Button>
+          </ControlsSection>
+        </List>
+      </Container>
+    </>
   )
 }
 

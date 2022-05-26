@@ -2,17 +2,27 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 export const getTodos = createAsyncThunk(
   '@@todos/getTodos',
-  async () => {
-    const res = await fetch('http://localhost:3001/todos')
-    const data = await res.json()
+  async (_, {
+    rejectWithValue
+  }) => {
+    try{
+      const res = await fetch('http://localhost:3001/todos')
+      const data = await res.json()
+
     return data;
+    } catch(err) {
+      return rejectWithValue('Failed loading data...')
+    }
   }
-)
+);
 
 export const addTodo = createAsyncThunk(
   '@@todos/addTodo',
-  async (title) => {
-    const res = await fetch('http://localhost:3001/todos', {
+  async (title, {
+    rejectWithValue
+  }) => {
+    try {
+      const res = await fetch('http://localhost:3001/todos', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -23,28 +33,39 @@ export const addTodo = createAsyncThunk(
       })
     })
     const data = await res.json();
-    return data;
+    return data;  
+    } catch(err) {
+      return rejectWithValue('Failed adding todo')
+    }
   }
-)
+);
 
 export const removeTodo = createAsyncThunk(
   '@@todos/removeTodo',
-  async (id) => {
-    const res = await fetch(`http://localhost:3001/todos/${id}`, {
+  async (id, {
+    rejectWithValue
+  }) => {
+    try {
+      const res = await fetch(`http://localhost:3001/todos/${id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
       },
     })
     await res.json();
-    return id;  
+    return id;
+    } catch(err) {
+      return rejectWithValue('Failed removing todo')
+    }
+      
   }
-)
+);
 
 export const toggleTodo = createAsyncThunk(
   '@@todos/toggleTodo',
-  async (id, {getState}) => {
-    const todo = getState().todos.todos.find(item => item.id === id);
+  async (id, {getState, rejectWithValue}) => {
+    try {
+      const todo = getState().todos.todos.find(item => item.id === id);
 
     const res = await fetch(`http://localhost:3001/todos/${id}`, {
       method: 'PATCH',
@@ -56,13 +77,18 @@ export const toggleTodo = createAsyncThunk(
 
     const data = await res.json();
     return data;
+    } catch(err) {
+      return rejectWithValue('Failed toggling todo')
+    }
+    
   }
 )
 
 export const clearCompleted = createAsyncThunk(
   '@@todos/clearCompleted',
-  async (_, {getState}) => {
-    const completedTodos = getState().todos.todos.filter(item => item.completed === true);
+  async (_, {getState, rejectWithValue}) => {
+    try {
+      const completedTodos = getState().todos.todos.filter(item => item.completed === true);
     const completedTodoIds = completedTodos.map(todo => todo.id)
 
     if(completedTodoIds.length > 0) {
@@ -82,52 +108,66 @@ export const clearCompleted = createAsyncThunk(
         return completedTodoIds;
       }
     } return completedTodoIds;
+    } catch(err) {
+      return rejectWithValue('Failed reseting todo')
+    }
   }
 )
 
 const todoSlice = createSlice({
-    name: '@@todos',
-    initialState: {
-      status: 'idle',
-      error: null,
-      todos: [],
+  name: '@@todos',
+  initialState: {
+    status: 'idle',
+    error: null,
+    todos: [],
   },
-    reducers: {},
-    extraReducers: (builder) => {
-      builder
-        .addCase(getTodos.rejected, (state) => {
-          state.status = 'idle'
-          state.error = 'something went wrong'
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(getTodos.rejected, (state) => {
+        state.status = 'idle'
+      })
+      .addCase(getTodos.pending, (state) => {
+        state.status = 'loading'
+        state.error = null
+      })
+      .addCase(getTodos.fulfilled, (state, action) => {
+        state.error = null
+        state.todos = action.payload
+      })
+      .addCase(addTodo.fulfilled, (state, action) => {
+        state.todos.push(action.payload)
+      })
+      .addCase(removeTodo.fulfilled, (state, action) => {
+        state.todos = state.todos.filter(todo => todo.id !== action.payload);
+      })
+      .addCase(toggleTodo.fulfilled, (state, action) => {
+        const index = state.todos.findIndex(todo => todo.id === action.payload.id)
+        state.todos[index] = action.payload;
+      })
+      .addCase(clearCompleted.fulfilled, (state, action) => {
+        const ids = action.payload
+        state.todos = state.todos.map((todo) => {
+        let match = ids.find(item => item === todo['id'])
+        if(match) {
+          todo.completed = false
+        }
+        return todo;
         })
-        .addCase(getTodos.pending, (state) => {
-          state.status = 'loading'
-          state.error = null
-        })
-        .addCase(getTodos.fulfilled, (state, action) => {
-          state.status = 'idle'
-          state.error = null
-          state.todos = action.payload
-        })
-        .addCase(addTodo.fulfilled, (state, action) => {
-          state.todos.push(action.payload)
-        })
-        .addCase(removeTodo.fulfilled, (state, action) => {
-          state.todos = state.todos.filter(todo => todo.id !== action.payload);
-        })
-        .addCase(toggleTodo.fulfilled, (state, action) => {
-          const index = state.todos.findIndex(todo => todo.id === action.payload.id)
-          state.todos[index] = action.payload;
-        })
-        .addCase(clearCompleted.fulfilled, (state, action) => {
-          const ids = action.payload
-          state.todos = state.todos.map((todo) => {
-          let match = ids.find(item => item === todo['id'])
-          if(match) {
-            todo.completed = false
-          }
-          return todo;
-        })
-    })
+      })
+      .addMatcher((action) => action.type.endsWith('/pending'), (state) => {
+        state.status = 'loading'
+        state.error = null
+      })
+      .addMatcher((action) => action.type.endsWith('/rejected'), (state, action) => {
+        console.log(action);
+        state.status = 'idle'
+        state.error = action.payload || action.error.message
+      }) 
+      .addMatcher((action) => action.type.endsWith('/fulfilled'), (state, action) => {
+        state.status = 'idle'
+      })  
+      
   }  
 })
 

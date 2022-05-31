@@ -14,6 +14,11 @@ const Button = styled.div`
   height: 15px;
   margin: 5px 10px;
   opacity: 0.7;
+
+  &:hover {
+    color: var(--colors-text);
+    transition-duration: 0.4s;
+  }
 `;
 
 export const Controls = () => {

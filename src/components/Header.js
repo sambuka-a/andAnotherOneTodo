@@ -8,7 +8,7 @@ const HeaderElement = styled.header`
     background-image: var(--bg-pic);
     background-size: cover;
     background-repeat: no-repeat;
-    background-color: var(--colors-list);
+    color: var(--colors-header);
     height: 250px;
 `;
 

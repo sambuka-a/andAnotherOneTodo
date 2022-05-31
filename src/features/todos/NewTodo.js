@@ -8,8 +8,9 @@ const Input = styled.input`
     position: relative;
     top: -7.6rem;
     width: 100%;
-    padding: 1rem;
-    background: var(--colors-text);
+    padding: 2em 1em;
+    color: var(--colors-text);
+    background: var(--colors-list);
     border: none;
     border-radius: 3px;
 `

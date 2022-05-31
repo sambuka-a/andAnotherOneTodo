@@ -1,23 +1,18 @@
 {
   "todos": [
     {
-      "title": "Finally start doing something :D",
-      "completed": true,
-      "id": 38
-    },
-    {
       "title": "rule the world",
       "completed": true,
       "id": 39
     },
     {
       "title": "Super old todo",
-      "completed": false,
+      "completed": true,
       "id": 42
     },
     {
       "title": "Finish this todo",
-      "completed": false,
+      "completed": true,
       "id": 43
     },
     {

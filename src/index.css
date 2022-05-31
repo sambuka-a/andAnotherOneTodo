@@ -1,4 +1,3 @@
-@import-normalize;
 @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;700&display=swap');
 
 * {
@@ -18,17 +17,19 @@
 }
 
 body[data-theme='light'] {
-  --colors-list: hsl(236, 9%, 61%);
+  --colors-header: hsl(240, 18%, 97%);
+  --colors-list: hsl(0, 0%, 98%);
   --colors-ft-text: hsl(233, 11%, 84%);
   --colors-bg: hsl(236, 33%, 92%);
   --bg-pic: url(../src/pics/bg-desktop-light.jpg);
-  --colors-text: hsl(0, 0%, 98%); 
+  --colors-text: hsl(235, 19%, 35%); 
   --colors-active: hsl(220, 98%, 61%);
   --colors-hover: hsl(235, 19%, 35%);
   --shadow: rgba(245, 245, 245, 0.2) 0 0 8px;
 }
 
 body[data-theme='dark'] {
+  --colors-header: hsl(240, 18%, 97%);
   --bg-pic: url(../src/pics/bg-desktop-dark.jpg);
   --colors-text: hsl(234, 39%, 85%);
   --colors-ft-text: hsl(234, 11%, 52%);

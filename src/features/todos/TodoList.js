@@ -19,8 +19,8 @@ const List = styled.div`
   position: relative;
   top: -5rem;
   width: 100%;
-  color: var(--colors-list);
-  background: var(--colors-text);
+  color: var(--colors-text);
+  background: var(--colors-list);
   border: none;
   border-radius: 3px;
 `;
@@ -29,7 +29,7 @@ const Li = styled.li`
   display: flex;
   justify-content: space-between;
   padding: 2rem 1rem 1.5rem 3rem;
-  border-bottom: 1px solid grey;
+  border-bottom: 1px solid var(--colors-bg);
 `
 
 const Input = styled.input`
@@ -58,11 +58,12 @@ const rotate = keyframes`
 const Indicator = styled.div`
   width: 1.3em;
   height: 1.3em;
-  background: #e6e6e6;
+  background: linear-gradient(125deg, hsl(192, 100%, 67%), hsl(280, 87%, 65%));
+  opacity: 0.75;
   position: absolute;
   top: -0.3rem;
   left: -2.2rem;
-  border: 1px solid #757575;
+  border: 1px solid linear-gradient(125deg, hsl(192, 100%, 67%), hsl(280, 87%, 65%));
   border-radius: 50%;
 
   ${Input}:not(:disabled):checked & {
@@ -70,7 +71,7 @@ const Indicator = styled.div`
   }
 
   ${Label}:hover & {
-    background: #ccc;
+    border: 1px solid hsl(192, 100%, 67%);
   }
 
   &::after {
@@ -81,11 +82,11 @@ const Indicator = styled.div`
 
   ${Input}:checked + &::after {
     display: block;
-    top: 0.1em;
-    left: 0.35em;
-    width: 30%;
-    height: 60%;
-    border: solid #263238;
+    top: 0.2em;
+    left: 0.4em;
+    width: 20%;
+    height: 40%;
+    border: solid var(--colors-list);
     border-width: 0 0.2em 0.2em 0;
     animation-name: ${rotate};
     animation-duration: 0.3s;
@@ -110,6 +111,11 @@ const Button = styled.div`
   height: 15px;
   margin: 5px 10px;
   opacity: 0.7;
+
+  &:hover {
+    color: var(--colors-text);
+    transition-duration: 0.4s;
+  }
 `;
 
 const TodoList = () => {
